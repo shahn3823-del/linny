@@ -1,0 +1,8 @@
+# 녹화 데이터와 학습 결과는 올리지 않는다
+data/
+out/
+*.csv
+__pycache__/
+node_modules/
+.DS_Store
+Thumbs.db
