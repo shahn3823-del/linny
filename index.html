@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#5AB953">
+<title>리니</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <h1 id="title">펀 에너지 모으기</h1>
+    <div class="cells" id="cells" aria-label="모은 에너지">
+      <i></i><i></i><i></i><span id="count">0 / 3</span>
+    </div>
+  </header>
+
+  <main>
+    <!-- 1. 홈 -->
+    <section class="screen" data-screen="home">
+      <div class="cards">
+        <button class="card" data-ex="pump">
+          <svg viewBox="0 0 100 100" class="ico"><path class="drop" d="M50 8C50 8 20 44 20 63a30 30 0 0 0 60 0C80 44 50 8 50 8Z"/></svg>
+          <b>물 퐁퐁</b><small>앞뒤로 왔다 갔다</small>
+        </button>
+        <button class="card" data-ex="dance">
+          <svg viewBox="0 0 100 100" class="ico"><path class="stroke" d="M40 72V24l40-8v48"/><circle class="fill-deep" cx="30" cy="74" r="11"/><circle class="fill-deep" cx="70" cy="66" r="11"/></svg>
+          <b>댄스마루</b><small>좌우로 살랑살랑</small>
+        </button>
+        <button class="card" data-ex="spin">
+          <svg viewBox="0 0 100 100" class="ico"><path class="bolt" d="M60 6 22 56h24l-8 38 40-54H54Z"/></svg>
+          <b>울끈불끈</b><small>제자리에서 빙글</small>
+        </button>
+      </div>
+      <p class="hint">전시 표지에 리니 코를 콕!</p>
+    </section>
+
+    <!-- 2. 미션: 물 퐁퐁 -->
+    <section class="screen mission" data-screen="pump">
+      <div class="cue">
+        <svg viewBox="0 0 100 100" class="arrow a-pump"><path d="M50 10v80M28 32l22-22 22 22M28 68l22 22 22-22"/></svg>
+        <b>앞뒤로!</b>
+      </div>
+      <div class="visual">
+        <div class="tank"><div class="water" id="water"></div><span id="pumpNum">0</span></div>
+        <svg viewBox="0 0 100 120" class="sprout" id="sprout">
+          <g id="sproutPlant">
+            <path class="stem" d="M50 110V50"/>
+            <path class="leaf" d="M50 62C38 40 20 38 8 44c8 16 26 22 42 18Z"/>
+            <path class="leaf" d="M50 52c8-24 28-32 44-28-6 18-24 28-44 28Z"/>
+          </g>
+          <path class="stem" d="M30 112h40"/>
+        </svg>
+      </div>
+      <div class="bar"><div></div></div>
+    </section>
+
+    <!-- 3. 미션: 댄스마루 -->
+    <section class="screen mission" data-screen="dance">
+      <div class="cue">
+        <svg viewBox="0 0 100 100" class="arrow a-dance"><path d="M10 50h80M32 28 10 50l22 22M68 28l22 22-22 22"/></svg>
+        <b>좌우로!</b>
+      </div>
+      <div class="visual bulbs" id="bulbs">
+        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
+        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
+        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
+        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
+        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
+      </div>
+      <div class="bar"><div></div></div>
+    </section>
+
+    <!-- 4. 미션: 울끈불끈 -->
+    <section class="screen mission" data-screen="spin">
+      <div class="cue">
+        <svg viewBox="0 0 100 100" class="arrow a-spin"><path d="M76 60A28 28 0 1 1 64 26"/><path d="M50 18l16 8-6 16"/></svg>
+        <b>빙글!</b>
+      </div>
+      <div class="visual">
+        <svg viewBox="0 0 220 130" class="gauge">
+          <path class="g-bg" d="M20 115a90 90 0 0 1 180 0"/>
+          <path class="g-fg" id="gaugeArc" pathLength="100" d="M20 115a90 90 0 0 1 180 0"/>
+          <line class="needle" id="needle" x1="110" y1="115" x2="110" y2="40"/>
+          <circle class="fill-deep" cx="110" cy="115" r="9"/>
+          <text x="80" y="92" id="spinNum">0</text>
+        </svg>
+      </div>
+      <div class="bar"><div></div></div>
+    </section>
+
+    <!-- 5. 미션 완료 -->
+    <section class="screen warm" data-screen="done">
+      <div class="row">
+        <svg viewBox="0 0 100 100" class="big-bolt pop"><path class="bolt" d="M60 6 22 56h24l-8 38 40-54H54Z"/></svg>
+        <div class="msg"><b>에너지 1개 완성!</b><small id="doneSub">다음 전시로 가 보자</small></div>
+      </div>
+    </section>
+
+    <!-- 6. 가득 참 -->
+    <section class="screen warm" data-screen="full">
+      <div class="row">
+        <button class="battery" id="battery"><span>100</span></button>
+        <div class="msg"><b>똥버스에<br>전해 주자!</b><small>정류장에 리니 코를 콕!</small></div>
+      </div>
+    </section>
+
+    <!-- 7. 전달 -->
+    <section class="screen" data-screen="sending">
+      <div class="road">
+        <div class="sparks"><i></i><i></i><i></i><i></i></div>
+        <svg viewBox="0 0 320 170" class="bus">
+          <path class="speed" d="M10 50h40M0 80h46M14 110h30"/>
+          <rect x="60" y="10" width="250" height="120" rx="26" class="bus-body"/>
+          <rect x="88" y="34" width="52" height="40" rx="6" class="bus-win"/>
+          <rect x="158" y="34" width="52" height="40" rx="6" class="bus-win"/>
+          <rect x="228" y="34" width="52" height="40" rx="6" class="bus-win"/>
+          <rect x="62" y="96" width="246" height="10" class="bus-stripe"/>
+          <circle cx="120" cy="134" r="22" class="wheel"/><circle cx="120" cy="134" r="8" class="hub"/>
+          <circle cx="250" cy="134" r="22" class="wheel"/><circle cx="250" cy="134" r="8" class="hub"/>
+        </svg>
+        <div class="ground"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="notice" hidden></div>
+</div>
+
+<!-- 주소 끝에 ?debug=1 을 붙이면 보이는 시험 버튼 -->
+<div id="debug" hidden>
+  <span>카드</span>
+  <button data-card="pump">물 퐁퐁</button>
+  <button data-card="dance">댄스마루</button>
+  <button data-card="spin">울끈불끈</button>
+  <button data-card="stop">정류장</button>
+  <span>동작</span>
+  <button data-motion="pump">pump</button>
+  <button data-motion="dance">dance</button>
+  <button data-motion="spin">spin</button>
+  <button data-motion="move">move</button>
+  <button data-motion="still">still</button>
+  <span></span>
+  <button id="dbgReset">처음으로</button>
+  <button id="dbgLog">기록 받기</button>
+  <output id="dbgInfo"></output>
+</div>
+
+<div id="rotate">휴대폰을 가로로 돌려 주세요</div>
+
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
