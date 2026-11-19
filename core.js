@@ -5,10 +5,14 @@
  * IMU를 어떻게 해석할지(센서 → 동작 이름)는 아직 정하지 않았다.
  * 나중에 무엇으로 판단하든(규칙, 학습 모델, 외부 IMU 부품) 아래 형식으로 넘기기만 하면 된다.
  *
- *   판단 하나 = { label: 'pump'|'dance'|'spin'|'move'|'still', conf: 0~1, source: '아무 이름' }
+ *   판단 하나 = { label: 'fwdback'|'spin'|'wiggle'|'move'|'still', conf: 0~1, source: '아무 이름' }
+ *     fwdback = 앞뒤로 왔다 갔다, spin = 제자리 빙글, wiggle = 좌우로 흔들흔들
  *   보통 0.5초마다 하나씩 들어온다고 가정한다(2초 구간을 0.5초마다 판단).
  *
- *   카드 하나 = 'pump' | 'dance' | 'spin' | 'stop'   (stop = 똥버스 정류장)
+ *   카드 하나 = 'car' | 'walnut' | 'water' | 'stop'   (stop = 똥버스 정류장)
+ *     car    = 영차영차 착한연료(자동차 운전)  ← fwdback
+ *     walnut = 울끈불끈 아지트(호두과자 굽기)  ← spin
+ *     water  = 발로콩콩 물이퐁퐁(밭에 물주기) ← wiggle
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
@@ -16,16 +20,22 @@
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  var MISSIONS = ['pump', 'dance', 'spin'];
-  var LABELS = ['pump', 'dance', 'spin', 'move', 'still'];
-  var CARDS = ['pump', 'dance', 'spin', 'stop'];
+  var MISSIONS = ['car', 'walnut', 'water'];
+  var MOTION = { car: 'fwdback', walnut: 'spin', water: 'wiggle' }; // 미션마다 인정하는 동작
+  var LABELS = ['fwdback', 'spin', 'wiggle', 'move', 'still'];
+  var CARDS = ['car', 'walnut', 'water', 'stop'];
 
   // 숫자 규칙은 전부 여기. 현장에서 바꿀 일이 생기면 이것만 고친다.
   var CONFIG = {
-    stepPerHit: 20,     // 한 번 인정될 때 진행도 증가
+    // 미션마다 몇 번 인정되면 끝나나(화면 그림과 맞춘 수)
+    //   car 5: 구간 5개를 달려 남산타워 도착
+    //   walnut 5: 한 번 돌 때마다 판 2개가 뒤집히며 한 줄(4개)씩 익어 호두과자 20개
+    //   water 6: 밭 3곳(왼쪽·가운데·오른쪽)에 두 번씩 물 → 바구니에 채소 3개
+    steps: { car: 5, walnut: 5, water: 6 },
     confMin: 0.8,       // 이 확신 이상이어야 센다
     needInRow: 2,       // 연속 몇 번이어야 인정하나
     cooldownMs: 1000,   // 인정 뒤 쉬는 시간
+    finishMs: 1500,     // 마지막 한 번 뒤 미션 화면에 머무는 시간(도착·마지막 줄·수확 그림을 보여 줌)
     doneMs: 3000,       // 미션 완료 화면 시간
     sendingMs: 10000,   // 전달 화면 시간
     idleMs: 90000,      // 이만큼 아무 일 없으면 처음으로
@@ -49,13 +59,15 @@
     function reset(now) {
       s = {
         screen: 'home',         // home | mission | done | full | sending
-        mission: null,          // pump | dance | spin
-        progress: 0,            // 0~100
-        done: { pump: false, dance: false, spin: false },
+        mission: null,          // car | walnut | water
+        step: 0,                // 인정된 횟수
+        progress: 0,            // 0~100 (step / 그 미션의 steps)
+        done: { car: false, walnut: false, water: false },
         enteredAt: now,         // 지금 화면에 들어온 시각
         lastActivity: now,
         inRow: 0,
         cooldownUntil: 0,
+        finishAt: 0,            // 0이 아니면 미션을 끝내고 완료 화면으로 넘어가기를 기다리는 중
         notice: null,           // 'already' | 'notEnough'
         noticeUntil: 0
       };
@@ -73,9 +85,11 @@
 
     function startMission(ex, now) {
       s.mission = ex;
+      s.step = 0;
       s.progress = 0;
       s.inRow = 0;
       s.cooldownUntil = 0;
+      s.finishAt = 0;
       go('mission', now);
     }
 
@@ -93,6 +107,7 @@
           return 'start';
 
         case 'mission':
+          if (s.finishAt) return 'ignored'; // 끝내는 중
           if (!isMission) { notify('notEnough', now); return 'notEnough'; }
           if (ex === s.mission) return 'same';
           if (s.done[ex]) { notify('already', now); return 'already'; }
@@ -118,28 +133,32 @@
       if (LABELS.indexOf(label) < 0) { out.reason = 'unknown-label'; return out; }
       if (s.screen !== 'mission') { out.reason = 'not-mission'; return out; }
       if (label !== 'still') s.lastActivity = now;
+      if (s.finishAt) { out.reason = 'finishing'; return out; }
       if (now < s.cooldownUntil) { out.reason = 'cooldown'; return out; }
 
-      if (label === s.mission && conf >= cfg.confMin) {
+      var want = MOTION[s.mission];
+      if (label === want && conf >= cfg.confMin) {
         s.inRow++;
       } else {
         s.inRow = 0;
-        out.reason = label !== s.mission ? 'other-motion' : 'low-conf';
+        out.reason = label !== want ? 'other-motion' : 'low-conf';
         return out;
       }
 
       if (s.inRow < cfg.needInRow) { out.reason = 'need-more'; return out; }
 
+      var total = cfg.steps[s.mission];
       s.inRow = 0;
       s.cooldownUntil = now + cfg.cooldownMs;
-      s.progress = Math.min(100, s.progress + cfg.stepPerHit);
+      s.step = Math.min(total, s.step + 1);
+      s.progress = Math.round(s.step / total * 100);
       out.applied = true;
       out.reason = 'step';
       out.progress = s.progress;
 
-      if (s.progress >= 100) {
+      if (s.step >= total) {
         s.done[s.mission] = true;
-        go('done', now);
+        s.finishAt = now + cfg.finishMs;
       }
       return out;
     }
@@ -148,8 +167,15 @@
     function tick(now) {
       if (s.notice && now >= s.noticeUntil) s.notice = null;
 
+      if (s.screen === 'mission' && s.finishAt && now >= s.finishAt) {
+        s.finishAt = 0;
+        go('done', now);
+        return;
+      }
+
       if (s.screen === 'done' && now - s.enteredAt >= cfg.doneMs) {
         s.mission = null;
+        s.step = 0;
         s.progress = 0;
         go(countDone(s.done) >= MISSIONS.length ? 'full' : 'home', now);
         return;
@@ -166,8 +192,10 @@
       return {
         screen: s.screen,
         mission: s.mission,
+        step: s.step,
+        steps: s.mission ? cfg.steps[s.mission] : 0,
         progress: s.progress,
-        done: { pump: s.done.pump, dance: s.done.dance, spin: s.done.spin },
+        done: { car: s.done.car, walnut: s.done.walnut, water: s.done.water },
         count: countDone(s.done),
         notice: s.notice,
         enteredAt: s.enteredAt
@@ -199,7 +227,7 @@
   // 휴대폰 → 보드: "<모드>,<진행도>,<미션 번호>,<완료 비트>*<검사값>"
   function boardFrame(st) {
     var b = st.mission ? MISSIONS.indexOf(st.mission) : 0;
-    var c = (st.done.pump ? 1 : 0) | (st.done.dance ? 2 : 0) | (st.done.spin ? 4 : 0);
+    var c = (st.done.car ? 1 : 0) | (st.done.walnut ? 2 : 0) | (st.done.water ? 4 : 0);
     var body = MODE[st.screen] + ',' + Math.round(st.progress) + ',' + b + ',' + c;
     return body + '*' + checksum(body);
   }
@@ -215,6 +243,7 @@
 
   return {
     MISSIONS: MISSIONS,
+    MOTION: MOTION,
     LABELS: LABELS,
     CARDS: CARDS,
     CONFIG: CONFIG,

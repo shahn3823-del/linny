@@ -17,76 +17,113 @@
   </header>
 
   <main>
-    <!-- 1. 홈 -->
+    <!-- 1. 홈 (그림은 전부 임시 SVG) -->
     <section class="screen" data-screen="home">
       <div class="cards">
-        <button class="card" data-ex="pump">
-          <svg viewBox="0 0 100 100" class="ico"><path class="drop" d="M50 8C50 8 20 44 20 63a30 30 0 0 0 60 0C80 44 50 8 50 8Z"/></svg>
-          <b>물 퐁퐁</b><small>앞뒤로 왔다 갔다</small>
+        <button class="card" data-ex="car">
+          <svg viewBox="0 0 100 100" class="ico">
+            <path class="body-car" d="M14 62v-12l12-4 10-14h28l12 14 10 4v12Z"/>
+            <path class="win" d="M40 36h10v10H32ZM56 36h8l8 10H56Z"/>
+            <circle class="tire" cx="32" cy="64" r="10"/><circle class="tire" cx="70" cy="64" r="10"/>
+          </svg>
+          <b>자동차 운전</b><small>앞뒤로 왔다 갔다</small>
         </button>
-        <button class="card" data-ex="dance">
-          <svg viewBox="0 0 100 100" class="ico"><path class="stroke" d="M40 72V24l40-8v48"/><circle class="fill-deep" cx="30" cy="74" r="11"/><circle class="fill-deep" cx="70" cy="66" r="11"/></svg>
-          <b>댄스마루</b><small>좌우로 살랑살랑</small>
+        <button class="card" data-ex="walnut">
+          <svg viewBox="0 0 100 100" class="ico">
+            <circle class="nut" cx="50" cy="50" r="34"/>
+            <path class="nut-line" d="M50 18v64M32 30c8 8 8 32 0 40M68 30c-8 8-8 32 0 40"/>
+          </svg>
+          <b>호두과자</b><small>제자리에서 빙글</small>
         </button>
-        <button class="card" data-ex="spin">
-          <svg viewBox="0 0 100 100" class="ico"><path class="bolt" d="M60 6 22 56h24l-8 38 40-54H54Z"/></svg>
-          <b>울끈불끈</b><small>제자리에서 빙글</small>
+        <button class="card" data-ex="water">
+          <svg viewBox="0 0 100 100" class="ico">
+            <path class="drop" d="M50 8C50 8 20 44 20 63a30 30 0 0 0 60 0C80 44 50 8 50 8Z"/>
+          </svg>
+          <b>물주기</b><small>좌우로 흔들흔들</small>
         </button>
       </div>
       <p class="hint">전시 표지에 리니 코를 콕!</p>
     </section>
 
-    <!-- 2. 미션: 물 퐁퐁 -->
-    <section class="screen mission" data-screen="pump">
+    <!-- 2. 미션: 자동차 운전 (영차영차 착한연료) — 앞뒤로 -->
+    <section class="screen mission" data-screen="car">
       <div class="cue">
-        <svg viewBox="0 0 100 100" class="arrow a-pump"><path d="M50 10v80M28 32l22-22 22 22M28 68l22 22 22-22"/></svg>
+        <svg viewBox="0 0 100 100" class="arrow a-fwd"><path d="M50 10v80M28 32l22-22 22 22M28 68l22 22 22-22"/></svg>
         <b>앞뒤로!</b>
       </div>
-      <div class="visual">
-        <div class="tank"><div class="water" id="water"></div><span id="pumpNum">0</span></div>
-        <svg viewBox="0 0 100 120" class="sprout" id="sprout">
-          <g id="sproutPlant">
-            <path class="stem" d="M50 110V50"/>
-            <path class="leaf" d="M50 62C38 40 20 38 8 44c8 16 26 22 42 18Z"/>
-            <path class="leaf" d="M50 52c8-24 28-32 44-28-6 18-24 28-44 28Z"/>
-          </g>
-          <path class="stem" d="M30 112h40"/>
-        </svg>
-      </div>
+      <svg class="scene" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet">
+        <rect width="480" height="240" rx="18" class="sky"/>
+        <path class="hill" d="M0 112c60-30 120-30 170-8 50-26 120-30 170 2 50-20 100-18 140 6v128H0Z"/>
+        <g id="carTower" class="tower">
+          <path d="M240 18v18"/>
+          <rect x="236" y="36" width="8" height="46"/>
+          <rect x="226" y="50" width="28" height="12" rx="5"/>
+          <rect x="232" y="82" width="16" height="30"/>
+        </g>
+        <rect y="112" width="480" height="128" class="grass"/>
+        <path class="road" d="M226 112h28l196 128H30Z"/>
+        <g id="carSide"></g>
+        <g id="carDash"></g>
+        <!-- 갈 길: 점 5개, 끝에 탑 -->
+        <g class="route">
+          <path class="route-line" d="M70 20h310"/>
+          <circle cx="132" cy="20" r="5"/><circle cx="194" cy="20" r="5"/><circle cx="256" cy="20" r="5"/><circle cx="318" cy="20" r="5"/>
+          <path class="route-goal" d="M392 6v28M386 34h12M388 14h8"/>
+          <g id="carMarker"><rect x="-11" y="-8" width="22" height="13" rx="5"/><circle cx="-5" cy="6" r="3.5"/><circle cx="5" cy="6" r="3.5"/></g>
+        </g>
+        <!-- 계기판 -->
+        <path class="dash-board" d="M150 240c0-50 40-78 90-78s90 28 90 78Z"/>
+        <path class="meter" d="M184 236a56 56 0 0 1 112 0"/>
+        <line id="carNeedle" class="meter-needle" x1="240" y1="236" x2="240" y2="190"/>
+        <circle cx="240" cy="236" r="7" class="fill-deep"/>
+      </svg>
       <div class="bar"><div></div></div>
     </section>
 
-    <!-- 3. 미션: 댄스마루 -->
-    <section class="screen mission" data-screen="dance">
-      <div class="cue">
-        <svg viewBox="0 0 100 100" class="arrow a-dance"><path d="M10 50h80M32 28 10 50l22 22M68 28l22 22-22 22"/></svg>
-        <b>좌우로!</b>
-      </div>
-      <div class="visual bulbs" id="bulbs">
-        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
-        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
-        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
-        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
-        <svg viewBox="0 0 60 80"><circle cx="30" cy="30" r="25"/><rect x="20" y="56" width="20" height="16" rx="3"/></svg>
-      </div>
-      <div class="bar"><div></div></div>
-    </section>
-
-    <!-- 4. 미션: 울끈불끈 -->
-    <section class="screen mission" data-screen="spin">
+    <!-- 3. 미션: 호두과자 굽기 (울끈불끈 아지트) — 빙글 -->
+    <section class="screen mission" data-screen="walnut">
       <div class="cue">
         <svg viewBox="0 0 100 100" class="arrow a-spin"><path d="M76 60A28 28 0 1 1 64 26"/><path d="M50 18l16 8-6 16"/></svg>
         <b>빙글!</b>
       </div>
-      <div class="visual">
-        <svg viewBox="0 0 220 130" class="gauge">
-          <path class="g-bg" d="M20 115a90 90 0 0 1 180 0"/>
-          <path class="g-fg" id="gaugeArc" pathLength="100" d="M20 115a90 90 0 0 1 180 0"/>
-          <line class="needle" id="needle" x1="110" y1="115" x2="110" y2="40"/>
-          <circle class="fill-deep" cx="110" cy="115" r="9"/>
-          <text x="80" y="92" id="spinNum">0</text>
-        </svg>
+      <svg class="scene" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="fire" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#FFC768"/><stop offset="1" stop-color="#FF8A3D"/>
+          </linearGradient>
+        </defs>
+        <rect width="480" height="240" rx="18" fill="url(#fire)"/>
+        <g id="crank" class="crank"><circle cx="70" cy="120" r="34"/><path d="M70 120h30M100 120v-22"/><circle cx="100" cy="96" r="8"/></g>
+        <g id="plateL" class="plate"><rect x="132" y="8" width="100" height="224" rx="16"/></g>
+        <g id="plateR" class="plate"><rect x="248" y="8" width="100" height="224" rx="16"/></g>
+        <text x="420" y="112" id="walnutNum" class="big-num">0</text>
+        <text x="420" y="146" class="small-num">/ 20</text>
+      </svg>
+      <div class="bar"><div></div></div>
+    </section>
+
+    <!-- 4. 미션: 밭에 물주기 (발로콩콩 물이퐁퐁) — 좌우로 흔들 -->
+    <section class="screen mission" data-screen="water">
+      <div class="cue">
+        <svg viewBox="0 0 100 100" class="arrow a-wiggle"><path d="M10 50h80M32 28 10 50l22 22M68 28l22 22-22 22"/></svg>
+        <b>흔들흔들!</b>
       </div>
+      <svg class="scene" viewBox="0 0 480 240" preserveAspectRatio="xMidYMid meet">
+        <rect width="480" height="240" rx="18" class="sky"/>
+        <path class="hill" d="M0 84c70-24 140-24 200-4 60-22 150-24 280 4v156H0Z"/>
+        <path class="field" d="M60 92h360l60 148H0Z"/>
+        <!-- 바구니 -->
+        <g class="basket">
+          <g id="basketIn"></g>
+          <path class="basket-body" d="M186 36h108l-12 34h-84Z"/>
+          <path class="basket-line" d="M196 46h88M200 56h80"/>
+        </g>
+        <g id="plots"></g>
+        <path id="spray" class="spray" d=""/>
+        <path id="aim" class="aim" d="M0 0l-9-14h18Z"/>
+        <g id="nozzle" class="nozzle"><rect x="-9" y="-50" width="18" height="60" rx="6"/><rect x="-12" y="-64" width="24" height="18" rx="5" class="nozzle-head"/></g>
+        <g id="flyer" class="flyer"></g>
+      </svg>
       <div class="bar"><div></div></div>
     </section>
 
@@ -108,7 +145,7 @@
 
     <!-- 7. 전달 -->
     <section class="screen" data-screen="sending">
-      <div class="road">
+      <div class="road-wrap">
         <div class="sparks"><i></i><i></i><i></i><i></i></div>
         <svg viewBox="0 0 320 170" class="bus">
           <path class="speed" d="M10 50h40M0 80h46M14 110h30"/>
@@ -131,18 +168,19 @@
 <!-- 주소 끝에 ?debug=1 을 붙이면 보이는 시험 버튼 -->
 <div id="debug" hidden>
   <span>카드</span>
-  <button data-card="pump">물 퐁퐁</button>
-  <button data-card="dance">댄스마루</button>
-  <button data-card="spin">울끈불끈</button>
-  <button data-card="stop">정류장</button>
+  <button data-card="car" title="키보드 1">1 자동차</button>
+  <button data-card="walnut" title="키보드 2">2 호두과자</button>
+  <button data-card="water" title="키보드 3">3 물주기</button>
+  <button data-card="stop" title="키보드 4">4 정류장</button>
   <span>동작</span>
-  <button data-motion="pump">pump</button>
-  <button data-motion="dance">dance</button>
-  <button data-motion="spin">spin</button>
-  <button data-motion="move">move</button>
-  <button data-motion="still">still</button>
+  <button id="dbgNow" title="키보드 스페이스">␣ 지금 미션 동작</button>
+  <button data-motion="fwdback">앞뒤</button>
+  <button data-motion="spin">빙글</button>
+  <button data-motion="wiggle">흔들</button>
+  <button data-motion="move">이동</button>
+  <button data-motion="still">정지</button>
   <span></span>
-  <button id="dbgReset">처음으로</button>
+  <button id="dbgReset" title="키보드 R">R 처음으로</button>
   <button id="dbgLog">기록 받기</button>
   <output id="dbgInfo"></output>
 </div>

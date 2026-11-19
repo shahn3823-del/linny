@@ -91,27 +91,33 @@ svg .stroke, .arrow path, .stem {
 .card small { font-size: 3.6dvh; font-weight: 600; opacity: .8; }
 .card.is-done { background: var(--green); }
 .card.is-done small { opacity: 1; }
-.card.is-done .drop { fill: var(--white); }
-.card.is-done .bolt { fill: var(--white); }
+.card.is-done .drop,
+.card.is-done .body-car,
+.card.is-done .nut { fill: var(--white); }
+.body-car { fill: var(--yellow); stroke: var(--deep); stroke-width: 6; stroke-linejoin: round; }
+.win { fill: var(--water); }
+.tire { fill: var(--deep); }
+.nut { fill: #C98A4B; stroke: var(--deep); stroke-width: 6; }
+.nut-line { fill: none; stroke: var(--deep); stroke-width: 5; stroke-linecap: round; }
 .hint { margin: 0; font-size: 5dvh; font-weight: 800; color: var(--hint); }
 
 /* ---- 2~4. 미션 공통 ---- */
 .mission { flex-wrap: wrap; align-items: center; }
 .cue {
-  width: 36%;
+  width: 24%;
   display: flex; flex-direction: column; align-items: center; gap: 2dvh;
 }
-.cue b { font-size: 9dvh; font-weight: 900; }
-.arrow { width: 30dvh; height: 30dvh; }
+.cue b { font-size: 7.5dvh; font-weight: 900; white-space: nowrap; }
+.arrow { width: 26dvh; height: 26dvh; }
 .arrow path { stroke-width: 11; }
-.a-pump  { animation: bob 1.2s ease-in-out infinite; }
-.a-dance { animation: sway 1.2s ease-in-out infinite; }
-.a-spin  { animation: turn 2s linear infinite; }
-@keyframes bob  { 50% { transform: translateY(-6%); } }
-@keyframes sway { 50% { transform: translateX(8%); } }
-@keyframes turn { to { transform: rotate(360deg); } }
+.a-fwd    { animation: bob 1.2s ease-in-out infinite; }
+.a-wiggle { animation: wiggle .7s ease-in-out infinite; }
+.a-spin   { animation: turn 2s linear infinite; }
+@keyframes bob    { 50% { transform: translateY(-6%); } }
+@keyframes wiggle { 25% { transform: translateX(-7%); } 75% { transform: translateX(7%); } }
+@keyframes turn   { to { transform: rotate(360deg); } }
 
-.visual { width: 64%; height: 62dvh; display: flex; align-items: center; justify-content: center; gap: 4vw; }
+.scene { width: 76%; height: 62dvh; }
 .bar {
   width: 100%; height: 6dvh;
   border: .9dvh solid var(--deep); border-radius: 3dvh;
@@ -119,42 +125,76 @@ svg .stroke, .arrow path, .stem {
 }
 .bar div { height: 100%; width: 0; background: var(--yellow); transition: width .4s; }
 
-/* 물통과 싹 */
-.tank {
-  position: relative;
-  width: 26dvh; height: 56dvh;
-  border: 1.2dvh solid var(--deep); border-radius: 4dvh;
-  background: var(--white); overflow: hidden;
-  display: flex; align-items: center; justify-content: center;
-}
-.water {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 0;
-  background: var(--water); transition: height .5s;
-}
-.water::before {
-  content: ""; position: absolute; left: -10%; right: -10%; top: -2dvh; height: 4dvh;
-  background: radial-gradient(circle at 50% 100%, var(--water) 60%, transparent 62%) 0 0 / 8dvh 4dvh repeat-x;
-}
-.tank span { position: relative; font-size: 10dvh; font-weight: 900; }
-.sprout { width: 26dvh; height: 32dvh; align-self: flex-end; margin-bottom: 3dvh; }
-.leaf { fill: var(--green); stroke: var(--deep); stroke-width: 5; stroke-linejoin: round; }
-#sproutPlant { transform-origin: 50px 110px; transition: transform .5s; }
+/* 공통 배경 */
+.sky  { fill: #CDEBFA; }
+.hill { fill: #A9D79A; }
 
-/* 전구 */
-.bulbs { gap: 1.5vw; }
-.bulbs svg { width: 13dvh; height: 17dvh; }
-.bulbs circle { fill: var(--white); stroke: var(--deep); stroke-width: 5; transition: fill .3s; }
-.bulbs rect { fill: var(--deep); }
-.bulbs svg.on circle { fill: var(--yellow); }
-.bulbs svg.on { animation: pop .4s; }
+/* 2. 자동차 운전 */
+.grass { fill: #8FCB7A; }
+.road  { fill: #7D878D; }
+.lane  { fill: var(--white); }
+.tree-trunk { fill: #8A5A33; }
+.tree-top   { fill: #4E9F45; }
+.tower { fill: #E9EEF2; stroke: var(--deep); stroke-width: 3; transform-box: fill-box; transform-origin: 50% 100%; transition: transform .8s ease-out; }
+.tower path { fill: none; stroke: #E0473A; stroke-width: 5; }
+.route-line { fill: none; stroke: var(--deep); stroke-width: 4; stroke-linecap: round; opacity: .35; }
+.route circle { fill: var(--white); stroke: var(--deep); stroke-width: 3; }
+.route circle.on { fill: var(--yellow); }
+.route-goal { fill: none; stroke: #E0473A; stroke-width: 4; stroke-linecap: round; }
+#carMarker { transition: transform .8s ease-out; }
+#carMarker rect { fill: var(--yellow); stroke: var(--deep); stroke-width: 3; }
+#carMarker circle { fill: var(--deep); }
+.dash-board { fill: #3B4146; }
+.meter { fill: none; stroke: #5F676D; stroke-width: 10; stroke-linecap: round; }
+.meter-needle { stroke: #FF5A4E; stroke-width: 5; stroke-linecap: round; }
 
-/* 발전기 게이지 */
-.gauge { width: 70dvh; height: 42dvh; }
-.g-bg, .g-fg { fill: none; stroke-width: 20; stroke-linecap: round; }
-.g-bg { stroke: var(--line); }
-.g-fg { stroke: var(--yellow); stroke-dasharray: 100; stroke-dashoffset: 100; transition: stroke-dashoffset .5s; }
-.needle { stroke: var(--deep); stroke-width: 6; stroke-linecap: round; transform-origin: 110px 115px; transform: rotate(-90deg); transition: transform .5s; }
-.gauge text { font-size: 30px; font-weight: 900; fill: var(--deep); text-anchor: middle; }
+/* 3. 호두과자 */
+.crank circle:first-child { fill: none; stroke: var(--deep); stroke-width: 9; }
+.crank path { fill: none; stroke: var(--deep); stroke-width: 9; stroke-linecap: round; }
+.crank circle:last-child { fill: #B0322C; }
+.crank { transform-box: view-box; transform-origin: 70px 120px; }
+.crank.go { animation: crank .9s ease-out; }
+@keyframes crank { to { transform: rotate(360deg); } }
+.plate > rect { fill: #33383C; stroke: #1E2225; stroke-width: 4; }
+.plate { transform-box: fill-box; transform-origin: 50% 50%; }
+.plate.flip { animation: flip .9s ease-in-out; }
+@keyframes flip { 50% { transform: scaleX(0); } }
+.cake circle { fill: #FFF1C2; stroke: #E4CB82; stroke-width: 2; transition: fill .4s; }
+.cake path { fill: none; stroke: #7A4316; stroke-width: 2.5; stroke-linecap: round; opacity: 0; transition: opacity .4s; }
+.cake.baked circle { fill: #C27B3A; stroke: #8A4F1E; }
+.cake.baked path { opacity: .9; }
+.cake.next circle { animation: sizzle .6s ease-in-out infinite; }
+@keyframes sizzle { 50% { fill: #FFE08A; } }
+.big-num { font-size: 56px; font-weight: 900; fill: var(--deep); text-anchor: middle; }
+.small-num { font-size: 24px; font-weight: 800; fill: var(--deep); text-anchor: middle; }
+
+/* 4. 물주기 */
+.field { fill: #B5835A; }
+.furrow { fill: none; stroke: #9C6B45; stroke-width: 3; }
+.plot-ring { fill: none; stroke: var(--yellow); stroke-width: 5; stroke-dasharray: 10 8; opacity: 0; }
+.plot.target .plot-ring { opacity: 1; animation: ring 1s linear infinite; }
+@keyframes ring { to { stroke-dashoffset: -36; } }
+.st0, .st1, .st2 { display: none; }
+.plot[data-st="0"] .st0, .plot[data-st="1"] .st1, .plot[data-st="2"] .st2 { display: inline; }
+.mound { fill: #8E5E3A; }
+.leaf2 { fill: var(--green); stroke: var(--deep); stroke-width: 2.5; stroke-linejoin: round; }
+.stalk { fill: none; stroke: #3F8E3A; stroke-width: 5; stroke-linecap: round; }
+.corn  { fill: #FFD84A; stroke: #B08A00; stroke-width: 2; }
+.cabbage { fill: #B9E79A; stroke: #3F8E3A; stroke-width: 3; }
+.flower { fill: #B79BF0; stroke: #6B4FB8; stroke-width: 2; }
+.plot .grow { transform-box: fill-box; transform-origin: 50% 100%; animation: grow .6s ease-out; }
+@keyframes grow { from { transform: scale(.3); } }
+.basket-body { fill: #E9B864; stroke: #9C6B2C; stroke-width: 4; stroke-linejoin: round; }
+.basket-line { fill: none; stroke: #9C6B2C; stroke-width: 3; }
+.nozzle rect { fill: #9FB3C2; stroke: var(--deep); stroke-width: 3; }
+.nozzle .nozzle-head { fill: #3B4146; }
+.nozzle { transition: transform .6s ease-in-out; }
+.aim { fill: var(--yellow); stroke: var(--deep); stroke-width: 3; stroke-linejoin: round; transition: transform .6s ease-in-out; }
+.spray { fill: none; stroke: #6EC1F0; stroke-width: 9; stroke-linecap: round; stroke-dasharray: 3 10; opacity: 0; }
+.spray.on { opacity: .95; animation: spray .25s linear infinite; }
+@keyframes spray { to { stroke-dashoffset: -13; } }
+.flyer { pointer-events: none; }
+.flyer g { transition: transform .9s cubic-bezier(.3,-.4,.6,1); }
 
 /* ---- 5, 6. 완료와 가득 참 ---- */
 .warm .row, .screen.warm { align-items: center; justify-content: center; }
@@ -188,7 +228,7 @@ svg .stroke, .arrow path, .stem {
 
 /* ---- 7. 전달 ---- */
 [data-screen="sending"] { align-items: flex-end; }
-.road { position: relative; width: 100%; height: 100%; }
+.road-wrap { position: relative; width: 100%; height: 100%; }
 .ground { position: absolute; left: 0; right: 0; bottom: 4dvh; height: 1.6dvh; background: var(--line); border-radius: 1dvh; }
 .bus {
   position: absolute; bottom: 4dvh; left: 0;
